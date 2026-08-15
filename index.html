@@ -1,41 +1,66 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#1769aa"><title>VED PHARMACY</title>
-<link rel="manifest" href="manifest.json"><meta name="theme-color" content="#1769aa">
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>VED PHARMACY</title>
 <style>
-*{box-sizing:border-box}body{margin:0;font-family:Arial;background:#f4f7fb;color:#17202a}header{background:#1769aa;color:white;padding:16px;position:sticky;top:0;z-index:5}h1{margin:0;font-size:21px}.sub{font-size:12px;opacity:.85;margin-top:4px}
-nav{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;background:white;padding:7px;position:sticky;top:65px;z-index:4;border-bottom:1px solid #ddd}nav button{border:0;border-radius:9px;padding:9px 3px;background:#edf3f8;font-size:11px}nav button.on{background:#1769aa;color:white}
-main{max-width:720px;margin:auto;padding:12px}.page{display:none}.page.on{display:block}.card{background:#fff;padding:13px;border-radius:13px;margin-bottom:12px;box-shadow:0 1px 5px #0001}
-.cards{display:grid;grid-template-columns:1fr 1fr;gap:9px}.stat{background:#fff;padding:13px;border-radius:13px}.label{font-size:11px;color:#667}.val{font-size:20px;font-weight:bold;margin-top:5px}
-input,select{width:100%;padding:11px;border:1px solid #ccd5df;border-radius:9px;margin:5px 0 8px;background:white}.row{display:grid;grid-template-columns:1fr 1fr;gap:7px}
-button.primary{width:100%;border:0;background:#1769aa;color:white;padding:12px;border-radius:10px;font-weight:bold;margin-top:5px}.item{padding:11px;border-bottom:1px solid #eee}.item:last-child{border:0}.small{font-size:11px;color:#667}.right{float:right}.danger{color:#c62828}.ok{color:#087f23}.total{font-size:20px;font-weight:bold;text-align:right;margin:10px 0}.tabs{display:flex;gap:6px;overflow:auto;margin-bottom:9px}.tabs button{border:0;border-radius:8px;padding:9px 12px;background:#edf3f8;white-space:nowrap}.tabs button.on{background:#1769aa;color:white}
-</style></head><body>
-<header><h1>💊 VED PHARMACY</h1><div class="sub">Mobile Pharmacy Management • Offline</div></header>
-<nav><button class="on" onclick="go('home',this)">🏠 Home</button><button onclick="go('bill',this)">🧾 Bill</button><button onclick="go('stock',this)">💊 Stock</button><button onclick="go('purchase',this)">📦 Purchase</button><button onclick="go('reports',this)">📊 Reports</button></nav>
+body{font-family:Arial;margin:0;background:#f4f7fb;color:#17202a}header{background:#1769aa;color:#fff;padding:16px}nav{display:flex;gap:5px;overflow:auto;background:#fff;padding:8px;position:sticky;top:0}nav button{padding:10px;border:0;border-radius:8px}nav .on{background:#1769aa;color:#fff}main{max-width:760px;margin:auto;padding:12px}.page{display:none}.page.on{display:block}.card{background:#fff;padding:14px;border-radius:12px;margin-bottom:12px;box-shadow:0 1px 5px #0001}input{width:100%;padding:10px;margin:5px 0;border:1px solid #ccd5df;border-radius:8px;box-sizing:border-box}.row{display:flex;gap:6px}.row>*{flex:1}button.primary{background:#1769aa;color:#fff;border:0;padding:11px;border-radius:8px}.item{padding:10px 0;border-bottom:1px solid #eee}.right{float:right}.small{font-size:12px;color:#667}.edit{background:#e8f1f8;border:0;padding:7px;border-radius:7px}.del{background:#fdeaea;border:0;padding:7px;border-radius:7px;color:#a00}.stat{font-size:20px;font-weight:bold}
+</style></head>
+<body>
+<header><b>💊 VED PHARMACY</b><div>Inventory • Purchase • Billing</div></header>
+<nav><button class="on" onclick="go('home',this)">Home</button><button onclick="go('purchase',this)">Purchase</button><button onclick="go('stock',this)">Stock</button><button onclick="go('bill',this)">Bill</button><button onclick="go('sales',this)">Sales</button></nav>
 <main>
-<section id="home" class="page on"><div class="cards">
-<div class="stat"><div class="label">Today's Sales</div><div class="val" id="ds">₹0</div></div><div class="stat"><div class="label">Bills</div><div class="val" id="bc">0</div></div>
-<div class="stat"><div class="label">Stock Value</div><div class="val" id="sv">₹0</div></div><div class="stat"><div class="label">Low Stock</div><div class="val danger" id="lc">0</div></div></div>
-<button class="primary" onclick="go('bill')">＋ NEW BILL</button><div class="card"><b>Alerts</b><div id="alerts" class="small" style="margin-top:8px"></div></div></section>
-
-<section id="bill" class="page"><div class="card"><h3>New Bill</h3><input id="bs" placeholder="Search medicine / company / barcode" oninput="billSearch()"><div id="bresults"></div></div>
-<div class="card"><h3>Cart</h3><div id="cart"></div><div class="row"><div><span class="small">Discount ₹</span><input id="disc" type="number" value="0" oninput="cartView()"></div><div><span class="small">Payment</span><select id="pay"><option>Cash</option><option>UPI</option><option>Card</option><option>Credit</option></select></div></div><div class="total" id="bt">Total ₹0</div><button class="primary" onclick="saveBill()">SAVE BILL</button></div></section>
-
-<section id="stock" class="page"><div class="card"><h3>Inventory</h3><input id="ss" placeholder="Search medicine/company/batch" oninput="stockView()"><div id="stock"></div></div></section>
-
-<section id="purchase" class="page"><div class="card"><h3>Purchase Entry</h3><input id="pn" placeholder="Medicine name"><input id="pc" placeholder="Company"><div class="row"><input id="pb" placeholder="Batch No."><input id="pe" type="month"></div><div class="row"><input id="pr" type="number" placeholder="Purchase rate"><input id="pm" type="number" placeholder="MRP"></div><div class="row"><input id="pq" type="number" placeholder="Quantity"><input id="pmin" type="number" placeholder="Minimum stock"></div><input id="ps" placeholder="Supplier"><input id="pinv" placeholder="Supplier invoice no."><button class="primary" onclick="purchase()">ADD PURCHASE</button></div></section>
-
-<section id="reports" class="page"><div class="card"><h3>Reports</h3><div class="tabs"><button class="on" onclick="report('sales',this)">Sales</button><button onclick="report('purchase',this)">Purchases</button><button onclick="report('stock',this)">Stock</button></div><div id="report"></div></div></section>
+<section id="home" class="page on"><div class="card"><div class="stat" id="sv">₹0</div><div class="small">Stock value</div><hr><div class="stat" id="lc">0</div><div class="small">Low stock items</div></div></section>
+<section id="purchase" class="page"><div class="card"><h3 id="pt">Purchase Entry</h3>
+<input id="pn" placeholder="Medicine name"><input id="pc" placeholder="Company"><div class="row"><input id="pb" placeholder="Batch"><input id="pe" type="month"></div>
+<div class="row"><input id="pr" type="number" placeholder="Purchase rate"><input id="pm" type="number" placeholder="MRP"></div>
+<div class="row"><input id="pq" type="number" placeholder="Quantity"><input id="pmin" type="number" placeholder="Minimum stock"></div>
+<input id="ps" placeholder="Supplier"><input id="pi" placeholder="Invoice No.">
+<button class="primary" id="pbtn" onclick="savePurchase()">ADD PURCHASE</button>
+<button class="primary" id="cancel" style="display:none" onclick="cancelEdit()">CANCEL EDIT</button></div>
+<div class="card"><h3>Purchase History</h3><input id="psearch" placeholder="Search..." oninput="purchaseView()"><div id="plist"></div></div></section>
+<section id="stock" class="page"><div class="card"><h3>Inventory</h3><input id="sq" placeholder="Search medicine" oninput="stockView()"><div id="stock"></div></div></section>
+<section id="bill" class="page"><div class="card"><h3>Billing</h3><p>Billing module ready for medicines saved in inventory.</p><div id="billstock"></div></div></section>
+<section id="sales" class="page"><div class="card"><h3>Sales</h3><div id="saleslist"></div></div></section>
 </main>
 <script>
-const K='VED_PHARMACY_V2';let db=JSON.parse(localStorage.getItem(K)||'{"batches":[],"sales":[],"purchases":[]}');let cart=[];
-const $=x=>document.getElementById(x),save=()=>{localStorage.setItem(K,JSON.stringify(db));refresh()};
-function go(id,b){document.querySelectorAll('.page').forEach(x=>x.classList.remove('on'));$(id).classList.add('on');document.querySelectorAll('nav button').forEach(x=>x.classList.remove('on'));if(b)b.classList.add('on');if(id==='stock')stockView();if(id==='bill'){billSearch();cartView()}if(id==='reports')report('sales')}
-function purchase(){let n=$('pn').value.trim();if(!n)return alert('Medicine name required');db.batches.push({id:Date.now(),name:n,company:$('pc').value,batch:$('pb').value,expiry:$('pe').value,purchase:+$('pr').value||0,mrp:+$('pm').value||0,qty:+$('pq').value||0,min:+$('pmin').value||5,supplier:$('ps').value,invoice:$('pinv').value});db.purchases.push({date:new Date().toISOString(),name:n,qty:+$('pq').value||0,total:(+$('pr').value||0)*(+$('pq').value||0),supplier:$('ps').value,invoice:$('pinv').value});['pn','pc','pb','pe','pr','pm','pq','pmin','ps','pinv'].forEach(x=>$(x).value='');save();alert('Purchase saved')}
-function stockView(){let q=($('ss').value||'').toLowerCase();let a=db.batches.filter(m=>(m.name+' '+m.company+' '+m.batch).toLowerCase().includes(q));$('stock').innerHTML=a.length?a.map(m=>`<div class=item><b>${m.name}</b> <span class=small>${m.company||''}</span><span class=right>Stock <b class="${m.qty<=m.min?'danger':'ok'}">${m.qty}</b></span><br><span class=small>Batch ${m.batch||'-'} • Exp ${m.expiry||'-'} • Purchase ₹${m.purchase} • MRP ₹${m.mrp}</span></div>`).join(''):'<div class=item>No stock found</div>'}
-function billSearch(){let q=($('bs').value||'').toLowerCase();let a=db.batches.filter(m=>m.qty>0&&(m.name+' '+m.company+' '+m.batch).toLowerCase().includes(q)).sort((x,y)=>(x.expiry||'9999').localeCompare(y.expiry||'9999')).slice(0,10);$('bresults').innerHTML=a.map(m=>`<div class=item onclick="add(${m.id})"><b>${m.name}</b><br><span class=small>${m.company} • Batch ${m.batch} • Exp ${m.expiry} • Stock ${m.qty} • MRP ₹${m.mrp}</span></div>`).join('')}
-function add(id){let m=db.batches.find(x=>x.id===id),c=cart.find(x=>x.id===id);if(c){if(c.qty<m.qty)c.qty++}else cart.push({id,qty:1});cartView()}
-function cartView(){let total=0;$('cart').innerHTML=cart.length?cart.map(c=>{let m=db.batches.find(x=>x.id===c.id);total+=m.mrp*c.qty;return `<div class=item><b>${m.name}</b> × ${c.qty}<span class=right>₹${m.mrp*c.qty}</span><br><button onclick="chg(${c.id},-1)">−</button> <button onclick="chg(${c.id},1)">+</button></div>`}).join(''):'<div class=item>No items</div>';total=Math.max(0,total-(+$('disc').value||0));$('bt').textContent='Total ₹'+total}
-function chg(id,d){let c=cart.find(x=>x.id===id),m=db.batches.find(x=>x.id===id);c.qty+=d;if(c.qty<=0)cart=cart.filter(x=>x.id!==id);if(c&&c.qty>m.qty)c.qty=m.qty;cartView()}
-function saveBill(){if(!cart.length)return alert('Cart empty');let gross=0,items=[];cart.forEach(c=>{let m=db.batches.find(x=>x.id===c.id);m.qty-=c.qty;gross+=m.mrp*c.qty;items.push({name:m.name,batch:m.batch,qty:c.qty,rate:m.mrp,purchase:m.purchase})});let total=Math.max(0,gross-(+$('disc').value||0));db.sales.push({no:'VP'+Date.now(),date:new Date().toISOString(),items,total,payment:$('pay').value});cart=[];$('disc').value=0;save();cartView();alert('Bill saved successfully')}
-function report(t,b){if(b){document.querySelectorAll('.tabs button').forEach(x=>x.classList.remove('on'));b.classList.add('on')}if(t==='sales')$('report').innerHTML='<b>Total sales: ₹'+db.sales.reduce((a,x)=>a+x.total,0)+'</b><div class=small style="margin-top:8px">'+db.sales.slice().reverse().map(s=>`${s.no} • ${new Date(s.date).toLocaleString()} • ₹${s.total} • ${s.payment}`).join('<br>')+'</div>';if(t==='purchase')$('report').innerHTML='<b>Purchase value: ₹'+db.purchases.reduce((a,x)=>a+x.total,0)+'</b><div class=small>'+db.purchases.slice().reverse().map(p=>`${p.name} • ${p.qty} • ₹${p.total} • ${p.supplier||'-'}`).join('<br>')+'</div>';if(t==='stock')$('report').innerHTML=db.batches.map(m=>`${m.name} • ${m.batch} • ${m.qty} units`).join('<br>')}
-function refresh(){let d=new Date()
+const KEY='VED_PHARMACY_EDIT_V1';
+let db=JSON.parse(localStorage.getItem(KEY)||'{"batches":[],"purchases":[],"sales":[]}'),editId=null;
+const $=id=>document.getElementById(id);
+function save(){localStorage.setItem(KEY,JSON.stringify(db));refresh();}
+function go(id,b){document.querySelectorAll('.page').forEach(x=>x.classList.remove('on'));$(id).classList.add('on');document.querySelectorAll('nav button').forEach(x=>x.classList.remove('on'));if(b)b.classList.add('on');if(id==='purchase')purchaseView();if(id==='stock')stockView();}
+function data(){return{name:$('pn').value.trim(),company:$('pc').value,batch:$('pb').value,expiry:$('pe').value,purchase:+$('pr').value||0,mrp:+$('pm').value||0,qty:+$('pq').value||0,min:+$('pmin').value||5,supplier:$('ps').value,invoice:$('pi').value};}
+function clearForm(){['pn','pc','pb','pe','pr','pm','pq','pmin','ps','pi'].forEach(id=>$(id).value='');}
+function savePurchase(){
+ let v=data(); if(!v.name)return alert('Medicine name required');
+ if(editId){
+  let p=db.purchases.find(x=>x.id===editId),b=db.batches.find(x=>x.id===p.batchId);
+  if(!p||!b)return alert('Record not found');
+  b.qty-=p.qty; Object.assign(b,v); b.qty+=v.qty;
+  Object.assign(p,{name:v.name,qty:v.qty,total:v.purchase*v.qty,supplier:v.supplier,invoice:v.invoice});
+  editId=null;$('pbtn').textContent='ADD PURCHASE';$('cancel').style.display='none';alert('Purchase updated');
+ }else{
+  let id=Date.now();db.batches.push({id,...v});db.purchases.push({id,name:v.name,qty:v.qty,total:v.purchase*v.qty,supplier:v.supplier,invoice:v.invoice,batchId:id,date:new Date().toISOString()});alert('Purchase saved');
+ }
+ clearForm();save();purchaseView();
+}
+function editPurchase(id){
+ let p=db.purchases.find(x=>x.id===id),b=db.batches.find(x=>x.id===p.batchId);if(!b)return;
+ editId=id;let m={pn:b.name,pc:b.company,pb:b.batch,pe:b.expiry,pr:b.purchase,pm:b.mrp,pq:b.qty,pmin:b.min,ps:b.supplier,pi:b.invoice};
+ Object.keys(m).forEach(k=>$(k).value=m[k]);$('pbtn').textContent='UPDATE PURCHASE';$('cancel').style.display='block';window.scrollTo(0,0);
+}
+function cancelEdit(){editId=null;clearForm();$('pbtn').textContent='ADD PURCHASE';$('cancel').style.display='none';}
+function deletePurchase(id){
+ let p=db.purchases.find(x=>x.id===id),b=db.batches.find(x=>x.id===p.batchId);
+ if(!confirm('Delete this purchase and remove its quantity from stock?'))return;
+ if(b)b.qty=Math.max(0,b.qty-p.qty);db.purchases=db.purchases.filter(x=>x.id!==id);save();purchaseView();
+}
+function purchaseView(){
+ let q=($('psearch').value||'').toLowerCase(),a=db.purchases.slice().reverse().filter(p=>(p.name+' '+p.supplier+' '+p.invoice).toLowerCase().includes(q));
+ $('plist').innerHTML=a.length?a.map(p=>`<div class="item"><b>${p.name}</b><span class="right">₹${p.total}</span><br><span class="small">${p.qty} units • ${p.supplier||'-'} • Invoice ${p.invoice||'-'}</span><br><button class="edit" onclick="editPurchase(${p.id})">✏️ Edit</button> <button class="del" onclick="deletePurchase(${p.id})">🗑️ Delete</button></div>`).join(''):'<div class="item">No purchases yet</div>';
+}
+function stockView(){
+ let q=($('sq').value||'').toLowerCase(),a=db.batches.filter(b=>(b.name+' '+b.company+' '+b.batch).toLowerCase().includes(q));
+ $('stock').innerHTML=a.map(b=>`<div class="item"><b>${b.name}</b><span class="right">Stock ${b.qty}</span><br><span class="small">${b.company} • Batch ${b.batch||'-'} • Exp ${b.expiry||'-'} • MRP ₹${b.mrp}</span></div>`).join('')||'<div class="item">No stock</div>';
+}
+function refresh(){ $('sv').textContent='₹'+db.batches.reduce((a,b)=>a+b.purchase*b.qty,0);$('lc').textContent=db.batches.filter(b=>b.qty<=b.min).length; }
+refresh();purchaseView();
+</script></body></html>
