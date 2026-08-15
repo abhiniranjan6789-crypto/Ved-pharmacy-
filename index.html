@@ -38,11 +38,4 @@ function cartView(){let total=0;$('cart').innerHTML=cart.length?cart.map(c=>{let
 function chg(id,d){let c=cart.find(x=>x.id===id),m=db.batches.find(x=>x.id===id);c.qty+=d;if(c.qty<=0)cart=cart.filter(x=>x.id!==id);if(c&&c.qty>m.qty)c.qty=m.qty;cartView()}
 function saveBill(){if(!cart.length)return alert('Cart empty');let gross=0,items=[];cart.forEach(c=>{let m=db.batches.find(x=>x.id===c.id);m.qty-=c.qty;gross+=m.mrp*c.qty;items.push({name:m.name,batch:m.batch,qty:c.qty,rate:m.mrp,purchase:m.purchase})});let total=Math.max(0,gross-(+$('disc').value||0));db.sales.push({no:'VP'+Date.now(),date:new Date().toISOString(),items,total,payment:$('pay').value});cart=[];$('disc').value=0;save();cartView();alert('Bill saved successfully')}
 function report(t,b){if(b){document.querySelectorAll('.tabs button').forEach(x=>x.classList.remove('on'));b.classList.add('on')}if(t==='sales')$('report').innerHTML='<b>Total sales: ₹'+db.sales.reduce((a,x)=>a+x.total,0)+'</b><div class=small style="margin-top:8px">'+db.sales.slice().reverse().map(s=>`${s.no} • ${new Date(s.date).toLocaleString()} • ₹${s.total} • ${s.payment}`).join('<br>')+'</div>';if(t==='purchase')$('report').innerHTML='<b>Purchase value: ₹'+db.purchases.reduce((a,x)=>a+x.total,0)+'</b><div class=small>'+db.purchases.slice().reverse().map(p=>`${p.name} • ${p.qty} • ₹${p.total} • ${p.supplier||'-'}`).join('<br>')+'</div>';if(t==='stock')$('report').innerHTML=db.batches.map(m=>`${m.name} • ${m.batch} • ${m.qty} units`).join('<br>')}
-function refresh(){let d=new Date().toDateString(),s=db.sales.filter(x=>new Date(x.date).toDateString()===d);$('ds').textContent='₹'+s.reduce((a,x)=>a+x.total,0);$('bc').textContent=s.length;$('sv').textContent='₹'+db.batches.reduce((a,x)=>a+x.purchase*x.qty,0);let low=db.batches.filter(x=>x.qty<=x.min);$('lc').textContent=low.length;$('alerts').innerHTML=low.length?low.map(x=>`<div class=danger>⚠ ${x.name} — ${x.qty} left</div>`).join(''):'No low-stock alerts.'}
-refresh();
-</script><script>
-if ("serviceWorker" in navigator) {
-  window.addEventListener("load", () => navigator.serviceWorker.register("sw.js"));
-}
-</script>
-</body></html>
+function refresh(){let d=new Date()
