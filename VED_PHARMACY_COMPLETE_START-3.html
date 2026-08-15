@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0b6e4f">
+<title>VED PHARMACY</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f4f7f6;color:#17211b;font-family:system-ui,-apple-system,Segoe UI,Arial,sans-serif}
+header{background:#0b6e4f;color:#fff;padding:15px 16px;position:sticky;top:0;z-index:20;box-shadow:0 2px 8px #0002}
+header b{font-size:21px}header small{display:block;opacity:.85;margin-top:2px}
+nav{position:sticky;top:68px;z-index:19;background:#fff;display:grid;grid-template-columns:repeat(5,1fr);gap:5px;padding:7px;border-bottom:1px solid #ddd}
+nav button{border:0;background:#eef3f1;border-radius:9px;padding:9px 3px;font-size:11px}nav button.active{background:#0b6e4f;color:#fff}
+main{max-width:850px;margin:auto;padding:12px}.page{display:none}.page.active{display:block}
+.card{background:#fff;border-radius:14px;padding:14px;margin-bottom:12px;box-shadow:0 2px 8px #0000000d}
+h2,h3{margin:0 0 12px}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}.stat{padding:13px;border-radius:12px;background:#f0f7f4}.stat b{display:block;font-size:20px;margin-top:4px}
+label{font-size:12px;color:#5c6a63;display:block;margin-top:5px}input,select{width:100%;padding:11px;margin:4px 0 8px;border:1px solid #ccd7d1;border-radius:9px;background:#fff;font-size:14px}.row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+button{font:inherit}.primary{background:#0b6e4f;color:#fff;border:0;border-radius:9px;padding:11px 13px;font-weight:600}.secondary{background:#e8f0ed;border:0;border-radius:9px;padding:10px}.danger{background:#fdeaea;color:#a50000;border:0;border-radius:8px;padding:8px}.edit{background:#e8f1ff;color:#1455a0;border:0;border-radius:8px;padding:8px}.return{background:#fff2cc;border:0;border-radius:8px;padding:8px}
+.actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}.item{padding:11px 0;border-bottom:1px solid #e8ecea}.item:last-child{border-bottom:0}.right{float:right}.muted{font-size:12px;color:#66736d}.green{color:#087443}.red{color:#b00020}.total{text-align:right;font-size:21px;font-weight:700;margin:12px 0}
+.searchrow{display:grid;grid-template-columns:1fr auto;gap:7px}.scanner{display:none;background:#111;border-radius:12px;padding:8px;margin-top:8px}.scanner video{width:100%;max-height:300px;border-radius:8px;background:#000}.scanner .scanmsg{color:#fff;text-align:center;padding:8px;font-size:12px}
+.badge{font-size:11px;background:#e9f3ef;padding:3px 7px;border-radius:20px}.empty{text-align:center;padding:20px;color:#748079}
+@media(max-width:520px){.grid{grid-template-columns:1fr 1fr}.row{grid-template-columns:1fr 1fr}nav button{font-size:10px}}
+</style>
+</head>
+<body>
+<header><b>💊 VED PHARMACY</b><small>Inventory • Purchase • Billing • Sales</small></header>
+<nav>
+<button class="active" onclick="showPage('home',this)">🏠 Home</button>
+<button onclick="showPage('bill',this)">🧾 Bill</button>
+<button onclick="showPage('stock',this)">📦 Stock</button>
+<button onclick="showPage('purchase',this)">🛒 Purchase</button>
+<button onclick="showPage('sales',this)">📊 Sales</button>
+</nav>
+
+<main>
+<section id="home" class="page active">
+<div class="grid">
+<div class="stat">Today's Sales<b id="todaySales">₹0</b></div>
+<div class="stat">Today's Bills<b id="todayBills">0</b></div>
+<div class="stat">Stock Items<b id="itemCount">0</b></div>
+<div class="stat">Low Stock<b id="lowCount" class="red">0</b></div>
+</div>
+<div class="card"><h3>Quick Actions</h3><div class="actions">
+<button class="primary" onclick="showPage('bill')">＋ New Bill</button>
+<button class="secondary" onclick="showPage('purchase')">＋ Purchase</button>
+<button class="secondary" onclick="showPage('stock')">📷 Scan Stock</button>
+</div></div>
+<div class="card"><h3>Alerts</h3><div id="alerts"></div></div>
+</section>
+
+<section id="purchase" class="page">
+<div class="card"><h3 id="purchaseTitle">Add Purchase</h3>
+<input id="pName" placeholder="Medicine name">
+<div class="row"><input id="pCompany" placeholder="Company"><input id="pBarcode" placeholder="Barcode"></div>
+<div class="row"><input id="pBatch" placeholder="Batch No."><input id="pExpiry" type="month" placeholder="Expiry"></div>
+<div class="row"><input id="pPurchase" type="number" step="0.01" placeholder="Purchase rate"><input id="pMrp" type="number" step="0.01" placeholder="MRP"></div>
+<div class="row"><input id="pQty" type="number" placeholder="Quantity"><input id="pMin" type="number" placeholder="Minimum stock" value="5"></div>
+<div class="row"><input id="pSupplier" placeholder="Supplier"><input id="pInvoice" placeholder="Invoice No."></div>
+<div class="actions"><button class="primary" id="purchaseSave" onclick="savePurchase()">SAVE PURCHASE</button><button class="secondary" id="purchaseCancel" style="display:none" onclick="cancelPurchaseEdit()">CANCEL EDIT</button><button class="secondary" onclick="openScanner('purchase')">📷 Scan Barcode</button></div>
+<div id="purchaseScanner" class="scanner"><video id="purchaseVideo" playsinline></video><div class="scanmsg">Point camera at a barcode</div></div>
+</div>
+<div class="card"><h3>Purchase History</h3><input id="purchaseSearch" placeholder="Search medicine, batch, supplier, invoice..." oninput="renderPurchases()"><div id="purchaseList"></div></div>
+</section>
+
+<section id="stock" class="page">
+<div class="card"><h3>Inventory</h3><div class="searchrow"><input id="stockSearch" placeholder="Search medicine/company/batch/barcode" oninput="renderStock()"><button class="secondary" onclick="openScanner('stock')">📷 Scan</button></div>
+<div id="stockScanner" class="scanner"><video id="stockVideo" playsinline></video><div class="scanmsg">Point camera at a barcode</div></div><div id="stockList"></div></div>
+</section>
+
+<section id="bill" class="page">
+<div class="card"><h3>New Bill</h3><div class="searchrow"><input id="billSearch" placeholder="Search medicine or barcode" oninput="renderBillSearch()"><button class="secondary" onclick="openScanner('bill')">📷 Scan</button></div>
+<div id="billScanner" class="scanner"><video id="billVideo" playsinline></video><div class="scanmsg">Point camera at a barcode</div></div><div id="billSearchList"></div></div>
+<div class="card"><h3>Cart</h3><div id="cartList"></div><div class="row"><input id="billDiscount" type="number" value="0" placeholder="Discount ₹" oninput="renderCart()"><select id="billPayment"><option>Cash</option><option>UPI</option><option>Card</option><option>Credit</option></select></div><div class="total" id="billTotal">Total ₹0</div><button class="primary" style="width:100%" onclick="saveBill()">SAVE BILL</button></div>
+</section>
+
+<section id="sales" class="page">
+<div class="card"><h3>Sales History / Returns</h3><input id="salesSearch" placeholder="Search bill no. or medicine..." oninput="renderSales()"><div id="salesList"></div></div>
+</section>
+</main>
+
+<script>
+const KEY='VED_PHARMACY_FINAL_V1';
+let db=JSON.parse(localStorage.getItem(KEY)||'{"batches":[],"purchases":[],"sales":[]}');
+let cart=[],editingPurchase=null,scanStream=null,scanTarget=null;
+
+const $=id=>document.getElementById(id);
+const money=n=>'₹'+Number(n||0).toFixed(2);
+function save(){localStorage.setItem(KEY,JSON.stringify(db));refresh();}
+function showPage(id,btn){document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));$(id).classList.add('active');document.querySelectorAll('nav button').forEach(x=>x.classList.remove('active'));if(btn)btn.classList.add('active');if(id==='purchase')renderPurchases();if(id==='stock')renderStock();if(id==='bill'){renderBillSearch();renderCart()}if(id==='sales')renderSales();}
+function purchaseData(){return{
+name:$('pName').value.trim(),company:$('pCompany').value.trim(),barcode:$('pBarcode').value.trim(),
+batch:$('pBatch').value.trim(),expiry:$('pExpiry').value,purchase:+$('pPurchase').value||0,mrp:+$('pMrp').value||0,
+qty:+$('pQty').value||0,min:+$('pMin').value||5,supplier:$('pSupplier').value.trim(),invoice:$('pInvoice').value.trim()
+};}
+function clearPurchase(){['pName','pCompany','pBarcode','pBatch','pExpiry','pPurchase','pMrp','pQty','pSupplier','pInvoice'].forEach(id=>$(id).value='');$('pMin').value=5;}
+function savePurchase(){
+ let v=purchaseData();if(!v.name)return alert('Medicine name required');if(v.qty<=0)return alert('Quantity must be greater than 0');
+ if(editingPurchase){
+  let p=db.purchases.find(x=>x.id===editingPurchase),b=db.batches.find(x=>x.id===p.batchId);
+  if(!p||!b)return alert('Purchase record not found');
+  b.qty=Math.max(0,b.qty-p.qty);Object.assign(b,v);b.qty+=v.qty;
+  Object.assign(p,{name:v.name,qty:v.qty,total:v.purchase*v.qty,supplier:v.supplier,invoice:v.invoice,date:new Date().toISOString()});
+  alert('Purchase updated successfully');
+ }else{
+  let id=Date.now(),b={id,...v};db.batches.push(b);db.purchases.push({id,name:v.name,qty:v.qty,total:v.purchase*v.qty,batchId:id,supplier:v.supplier,invoice:v.invoice,date:new Date().toISOString()});
+  alert('Purchase saved');
+ }
+ editingPurchase=null;$('purchaseTitle').textContent='Add Purchase';$('purchaseSave').textContent='SAVE PURCHASE';$('purchaseCancel').style.display='none';clearPurchase();save();renderPurchases();
+}
+function editPurchase(id){
+ let p=db.purchases.find(x=>x.id===id),b=db.batches.find(x=>x.id===p.batchId);if(!b)return;
+ editingPurchase=id;let m={pName:b.name,pCompany:b.company,pBarcode:b.barcode,pBatch:b.batch,pExpiry:b.expiry,pPurchase:b.purchase,pMrp:b.mrp,pQty:b.qty,pMin:b.min,pSupplier:b.supplier,pInvoice:b.invoice};
+ Object.entries(m).forEach(([id,val])=>$(id).value=val??'');$('purchaseTitle').textContent='Edit Purchase';$('purchaseSave').textContent='UPDATE PURCHASE';$('purchaseCancel').style.display='inline-block';window.scrollTo({top:0,behavior:'smooth'});
+}
+function cancelPurchaseEdit(){editingPurchase=null;clearPurchase();$('purchaseTitle').textContent='Add Purchase';$('purchaseSave').textContent='SAVE PURCHASE';$('purchaseCancel').style.display='none';}
+function deletePurchase(id){
+ let p=db.purchases.find(x=>x.id===id),b=db.batches.find(x=>x.id===p.batchId);if(!confirm('Delete this purchase? Its purchased quantity will be removed from stock.'))return;
+ if(b)b.qty=Math.max(0,b.qty-p.qty);db.purchases=db.purchases.filter(x=>x.id!==id);save();renderPurchases();
+}
+function renderPurchases(){
+ let q=($('purchaseSearch').value||'').toLowerCase(),a=db.purchases.slice().reverse().filter(p=>{let b=db.batches.find(x=>x.id===p.batchId)||{};return(p.name+' '+p.supplier+' '+p.invoice+' '+(b.batch||'')).toLowerCase().includes(q)});
+ $('purchaseList').innerHTML=a.length?a.map(p=>{let b=db.batches.find(x=>x.id===p.batchId)||{};return `<div class="item"><b>${p.name}</b><span class="right">${money(p.total)}</span><br><span class="muted">${p.qty} units • Batch ${b.batch||'-'} • Exp ${b.expiry||'-'} • ${p.supplier||'-'} • Invoice ${p.invoice||'-'}</span><div class="actions"><button class="edit" onclick="editPurchase(${p.id})">✏️ Edit</button><button class="danger" onclick="deletePurchase(${p.id})">🗑️ Delete</button></div></div>`}).join(''):'<div class="empty">No purchases found</div>';
+}
+function renderStock(){
+ let q=($('stockSearch').value||'').toLowerCase(),a=db.batches.filter(b=>(b.name+' '+b.company+' '+b.batch+' '+b.barcode).toLowerCase().includes(q));
+ $('stockList').innerHTML=a.length?a.map(b=>`<div class="item"><b>${b.name}</b><span class="right ${b.qty<=b.min?'red':'green'}">Stock ${b.qty}</span><br><span class="muted">${b.company||'-'} • Batch ${b.batch||'-'} • Exp ${b.expiry||'-'} • MRP ${money(b.mrp)} • Barcode ${b.barcode||'-'}</span></div>`).join(''):'<div class="empty">No stock found</div>';
+}
+function renderBillSearch(){
+ let q=($('billSearch').value||'').toLowerCase(),a=db.batches.filter(b=>b.qty>0&&(b.name+' '+b.company+' '+b.batch+' '+b.barcode).toLowerCase().includes(q)).slice(0,20);
+ $('billSearchList').innerHTML=a.length?a.map(b=>`<div class="item" onclick="addCart(${b.id})"><b>${b.name}</b><span class="right">MRP ${money(b.mrp)}</span><br><span class="muted">${b.company||'-'} • Batch ${b.batch||'-'} • Exp ${b.expiry||'-'} • Stock ${b.qty}</span></div>`).join(''):'<div class="empty">No matching medicine</div>';
+}
+function addCart(id){let b=db.batches.find(x=>x.id===id),c=cart.find(x=>x.id===id);if(!b)return;if(c){if(c.qty<b.qty)c.qty++}else cart.push({id,qty:1});renderCart();}
+function changeCart(id,d){let c=cart.find(x=>x.id===id),b=db.batches.find(x=>x.id===id);if(!c)return;c.qty+=d;if(c.qty<=0)cart=cart.filter(x=>x.id!==id);if(c&&c.qty>b.qty)c.qty=b.qty;renderCart();}
+function renderCart(){
+ let total=0;$('cartList').innerHTML=cart.length?cart.map(c=>{let b=db.batches.find(x=>x.id===c.id),t=b.mrp*c.qty;total+=t;return `<div class="item"><b>${b.name}</b><span class="right">${money(t)}</span><br><span class="muted">Batch ${b.batch||'-'} × ${c.qty}</span><div class="actions"><button class="secondary" onclick="changeCart(${c.id},-1)">−</button><button class="secondary" onclick="changeCart(${c.id},1)">+</button></div></div>`}).join(''):'<div class="empty">Cart is empty</div>';
+ total=Math.max(0,total-(+$('billDiscount').value||0));$('billTotal').textContent='Total '+money(total);
+}
+function saveBill(){
+ if(!cart.length)return alert('Cart is empty');let items=[],gross=0;
+ for(let c of cart){let b=db.batches.find(x=>x.id===c.id);if(!b||c.qty>b.qty)return alert('Insufficient stock for '+(b?.name||''));b.qty-=c.qty;gross+=b.mrp*c.qty;items.push({batchId:b.id,name:b.name,batch:b.batch,qty:c.qty,rate:b.mrp,purchase:b.purchase});}
+ let total=Math.max(0,gross-(+$('billDiscount').value||0));db.sales.push({id:Date.now(),no:'VP'+Date.now(),date:new Date().toISOString(),items,total,payment:$('billPayment').value,returned:false});cart=[];$('billDiscount').value=0;save();renderCart();renderBillSearch();alert('Bill saved successfully');
+}
+function renderSales(){
+ let q=($('salesSearch').value||'').toLowerCase(),a=db.sales.slice().reverse().filter(s=>(s.no+' '+s.items.map(i=>i.name).join(' ')).toLowerCase().includes(q));
+ $('salesList').innerHTML=a.length?a.map(s=>`<div class="item"><b>${s.no}</b><span class="right">${money(s.total)}</span><br><span class="muted">${new Date(s.date).toLocaleString()} • ${s.payment} • ${s.items.length} item(s) ${s.returned?'• RETURNED':''}</span>${s.returned?'':`<div class="actions"><button class="return" onclick="returnBill(${s.id})">↩️ Return Bill</button></div>`}</div>`).join(''):'<div class="empty">No sales found</div>';
+}
+function returnBill(id){
+ let s=db.sales.find(x=>x.id===id);if(!s||s.returned)return;if(!confirm('Return the entire bill and add all items back to stock?'))return;
+ s.items.forEach(i=>{let b=db.batches.find(x=>x.id===i.batchId);if(b)b.qty+=i.qty});s.returned=true;save();renderSales();
+}
+function refresh(){
+ let today=new Date().toDateString(),sales=db.sales.filter(s=>new Date(s.date).toDateString()===today&&!s.returned);
+ $('todaySales').textContent=money(sales.reduce((a,s)=>a+s.total,0));$('todayBills').textContent=sales.length;$('itemCount').textContent=db.batches.reduce((a,b)=>a+(b.qty>0?1:0),0);
+ let low=db.batches.filter(b=>b.qty<=b.min);$('lowCount').textContent=low.length;$('alerts').innerHTML=low.length?low.map(b=>`<div class="item red">⚠️ ${b.name} — only ${b.qty} left</div>`).join(''):'<div class="muted">No low-stock alerts.</div>';
+}
+async function openScanner(target){
+ closeScanner();scanTarget=target;let box=$(target==='purchase'?'purchaseScanner':target==='stock'?'stockScanner':'billScanner');box.style.display='block';
+ if(!('BarcodeDetector' in window)){box.querySelector('.scanmsg').textContent='Barcode camera is not supported by this browser. Use Chrome on a supported device or enter the barcode manually.';return;}
+ try{scanStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'}}});let video=$(target==='purchase'?'purchaseVideo':target==='stock'?'stockVideo':'billVideo');video.srcObject=scanStream;await video.play();let detector=new BarcodeDetector();scanLoop(detector,video);}
+ catch(e){box.querySelector('.scanmsg').textContent='Camera permission denied or unavailable.';}
+}
+async function scanLoop(detector,video){
+ if(!scanStream)return;try{let codes=await detector.detect(video);if(codes.length){let code=codes[0].rawValue;closeScanner();handleBarcode(code);return;}}catch(e){}requestAnimationFrame(()=>scanLoop(detector,video));
+}
+function handleBarcode(code){
+ if(scanTarget==='purchase'){$('pBarcode').value=code;let b=db.batches.find(x=>x.barcode===code);if(b){$('pName').value=b.name;$('pCompany').value=b.company;$('pBatch').value=b.batch;$('pExpiry').value=b.expiry;$('pPurchase').value=b.purchase;$('pMrp').value=b.mrp;$('pMin').value=b.min;}}
+ else if(scanTarget==='bill'){$('billSearch').value=code;renderBillSearch();let b=db.batches.find(x=>x.barcode===code);if(b)addCart(b.id);}
+ else {$('stockSearch').value=code;renderStock();}
+}
+function closeScanner(){if(scanStream){scanStream.getTracks().forEach(t=>t.stop());scanStream=null;}document.querySelectorAll('.scanner').forEach(x=>x.style.display='none');}
+refresh();renderPurchases();renderStock();
+</script>
+</body></html>
